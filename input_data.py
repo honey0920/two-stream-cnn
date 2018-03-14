@@ -1,4 +1,3 @@
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -8,8 +7,10 @@ import random
 import tensorflow as tf
 
 IMAGE_SIZE = 224
+NUM_CLASSES = 101
+
 NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 100
-NUM_EXAMPLE_PER_EPOCH_FOR_EVAL = 20
+NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 20
 
 def get_frame_path(videoname):
 	image_path = ''
@@ -25,7 +26,6 @@ def read_data(input_queue):
 	label = input_queue[1]
 	file_contents = tf.read_file(input_queue[0])
 	example= tf.image.decode_jpeg(file_contents,channels=3)
-	example.set_shape([240,320,3])
 
 	return example, label
 

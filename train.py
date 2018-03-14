@@ -22,7 +22,7 @@ tf.app.flags.DEFINE_boolean('log_device_placement', False,
 
 
 def train():
-	with tf.Graph.as_default():
+	with tf.Graph().as_default():
 		global_step = tf.train.get_or_create_global_step()
 		images, labels = model.distorted_inputs()
 
@@ -44,15 +44,13 @@ def train():
 
 		for step in xrange(FLAGS.max_steps):
 			start_time = time.time()
-			image_batch, label_batch = sess.run([images, labels])
-			_, loss_value = sess.run([train_op, loss])
+			_, loss_value  = sess.run([train_op, loss])
 			duration = time.time() -  start_time
-			if step %10 == 0:
+			if step %1 == 0:
 				examples_per_sec = FLAGS.batch_size/duration
 				sec_per_batch = float(duration)
-
 				format_str = ('step %d,loss = %.2f (%.1f examples/sec; %.3f sec/batch)')
-				print(format_str %(step, loss_value, examples_per_sec, sec_per_batch))
+				print(format_str %(step, loss_value,  examples_per_sec, sec_per_batch))
 			if step % 1000 ==0 or(step+1) == FLAGS.max_steps:
 				checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
 				saver.save(sess, checkpoint_path, global_step=step)
