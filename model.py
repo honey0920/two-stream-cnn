@@ -1,4 +1,3 @@
-
 import tensorflow as tf
 import input_data
 
@@ -7,9 +6,8 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_integer('batch_size', 128,
                             """Number of images to process in a batch.""")
 tf.app.flags.DEFINE_string('data_dir',
-                               'F:\\UCF-101\\data',
-                               """Path to the fashionAI data directory.""")
-
+                           'F:\\UCF-101\\data',
+                           """Path to the fashionAI data directory.""")
 
 IMAGE_SIZE = input_data.IMAGE_SIZE
 NUM_CLASSES = input_data.NUM_CLASSES
@@ -17,10 +15,11 @@ NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = input_data.NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN
 NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = input_data.NUM_EXAMPLES_PER_EPOCH_FOR_EVAL
 
 # Constants describing the training process.
-MOVING_AVERAGE_DECAY = 0.9999     # The decay to use for the moving average.
-NUM_EPOCHS_PER_DECAY = 350.0      # Epochs after which learning rate decays.
+MOVING_AVERAGE_DECAY = 0.9999  # The decay to use for the moving average.
+NUM_EPOCHS_PER_DECAY = 350.0  # Epochs after which learning rate decays.
 LEARNING_RATE_DECAY_FACTOR = 0.1  # Learning rate decay factor.
-INITIAL_LEARNING_RATE = 0.1       # Initial learning rate.
+INITIAL_LEARNING_RATE = 0.1  # Initial learning rate.
+
 
 def _variable_on_cpu(name, shape, initializer):
     """Helper to create a Variable stored on CPU memory.
@@ -58,12 +57,12 @@ def _variable_with_weight_decay(name, shape, stddev, wd):
         tf.add_to_collection('losses', weight_decay)
     return var
 
+
 def distorted_inputs():
     if not FLAGS.data_dir:
         raise ValueError('Please supply a data_dir')
-    images, labels = input_data.distorted_inputs(FLAGS.data_dir,batch_size=FLAGS.batch_size)
+    images, labels = input_data.distorted_inputs(FLAGS.data_dir, batch_size=FLAGS.batch_size)
     return images, labels
-
 
 
 def inference(images):
@@ -135,22 +134,22 @@ def inference(images):
         fc6 = tf.nn.relu(tf.matmul(reshape, weights) + biases, name=scope.name)
 
     with tf.variable_scope('fc7') as scope:
-        weights = _variable_with_weight_decay('weights',shape=[4096, 2048], stddev=0.04, wd=0.004)
+        weights = _variable_with_weight_decay('weights', shape=[4096, 2048], stddev=0.04, wd=0.004)
         biases = tf.Variable(tf.constant(0.1, shape=[2048]))
         fc7 = tf.nn.relu(tf.matmul(fc6, weights) + biases)
-        fc7_drop = tf.nn.dropout(fc7,keep_prob=0.5, name = scope.name)
+        fc7_drop = tf.nn.dropout(fc7, keep_prob=0.5, name=scope.name)
 
     with tf.variable_scope('softmax_linear') as scope:
-        weights = _variable_with_weight_decay('weights',shape=[2048, 101], stddev=1 / 2048.0,wd=0.0)
+        weights = _variable_with_weight_decay('weights', shape=[2048, 101], stddev=1 / 2048.0, wd=0.0)
         biases = tf.Variable(tf.constant(0.1, shape=[101]))
         softmax_linear = tf.add(tf.matmul(fc7_drop, weights), biases, name=scope.name)
     return softmax_linear
 
 
 def loss(logits, labels):
-    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels = labels)
+    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels)
     cross_entropy_mean = tf.reduce_mean(cross_entropy, name='cross_entropy')
 
     tf.add_to_collection('losses', cross_entropy_mean)
-  
+
     return tf.add_n(tf.get_collection('losses'), name='total_loss')
