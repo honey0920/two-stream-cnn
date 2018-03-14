@@ -1,3 +1,4 @@
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -84,16 +85,15 @@ def distorted_inputs(ucf_path, batch_size):
 		return _generate_image_and_label_batch(distorted_image, label, min_queue_examples, batch_size, shuffle = True)
 
 
-if __name__ == '__main__':
-
-    with tf.Graph().as_default():
-        result = distorted_inputs(FILE_PATH, 64)
-
-        with tf.Session() as sess:
-            coord = tf.train.Coordinator()
-            threads = tf.train.start_queue_runners(coord=coord)
-            for i in range(10):
-                example = sess.run(result)
-                print('hello')
-            coord.request_stop()
-            coord.join(threads)
+# if __name__ == '__main__':
+#     with tf.Graph().as_default():
+#         result = distorted_inputs(FILE_PATH, 64)
+#
+#         with tf.Session() as sess:
+#             coord = tf.train.Coordinator()
+#             threads = tf.train.start_queue_runners(coord=coord)
+#             for i in range(10):
+#                 example = sess.run(result)
+#                 print('hello')
+#             coord.request_stop()
+#             coord.join(threads)

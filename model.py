@@ -1,3 +1,4 @@
+
 import tensorflow as tf
 import input_data
 
@@ -126,7 +127,7 @@ def inference(images):
                            padding='SAME', name='pool1')
 
     with tf.variable_scope('fc6') as scope:
-        reshape = tf.reshape(pool5, [batch_size, -1])
+        reshape = tf.reshape(pool5, [FLAGS.batch_size, -1])
         dim = reshape.get_shape()[1].value
         weights = _variable_with_weight_decay(shape=[dim, 4096], stddev=0.04, wd=0.004)
         biases = tf.Variable(tf.constant(0.1, shape=[4096]))
