@@ -8,6 +8,7 @@ from six.moves import xrange
 import tensorflow as tf
 import os
 import model
+import model_vgg16
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -18,15 +19,24 @@ tf.app.flags.DEFINE_integer('max_steps', 1000000,
                             """Number of batches to run.""")
 tf.app.flags.DEFINE_boolean('log_device_placement', False,
                             """Whether to log device placement.""")
+tf.app.flags.DEFINE_boolean('log_device_placement', False,
+                            """Whether to log device placement.""")
 
-
-def train():
+tf.app.flags.DEFINE_string('vgg_model', 'F:\\UCF-101\\model\\vgg16.npy',
+                           """Directory where to write event logs """
+                           """and checkpoint.""")
+def train(vgg_model = False):
     with tf.Graph().as_default():
         global_step = tf.train.get_or_create_global_step()
         images, labels = model.distorted_inputs()
 
-        logits = model.inference(images)
-        loss = model.loss(logits, labels)
+        if vgg_model:
+            logits = model_vgg16.inference(images,vgg16_npy_path=vgg_model)
+            loss = model_vgg16.loss(logits, labels)
+        else:
+            logits = model.inference(images)
+            loss = model.loss(logits, labels)
+
         train_op = tf.train.MomentumOptimizer(1e-3, momentum=0.9).minimize(loss, global_step=global_step)
 
         saver = tf.train.Saver(tf.all_variables())
@@ -50,7 +60,10 @@ def train():
                 format_str = ('step %d,loss = %.2f (%.1f examples/sec; %.3f sec/batch)')
                 print(format_str % (step, loss_value, examples_per_sec, sec_per_batch))
             if step % 1000 == 0 or (step + 1) == FLAGS.max_steps:
-                checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
+                if vgg_model:
+                    checkpoint_path = os.path.join(FLAGS.train_dir, 'vgg_model.ckpt')
+                else:
+                    checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
 
 
