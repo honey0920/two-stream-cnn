@@ -23,9 +23,13 @@ tf.app.flags.DEFINE_boolean('run_once', False,
                             """Whether to run eval only once.""")
 
 
-def eval_once(saver, top_k_op):
+def eval_once(saver, top_k_op, use_vgg = False):
     with tf.Session() as sess:
-        ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
+        if use_vgg:
+            ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir, 'vgg_model.ckpt')
+        else:
+            ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir, 'model.ckpt')
+
         if ckpt and ckpt.model_checkpoint_path:
             # Restores from checkpoint
             saver.restore(sess, ckpt.model_checkpoint_path)
@@ -57,8 +61,7 @@ def eval_once(saver, top_k_op):
         coord.join(threads, stop_grace_period_secs=10)
 
 
-def evaluate():
-    """Eval CIFAR-10 for a number of steps."""
+def evaluate(use_vgg = False):
     with tf.Graph().as_default():
 
         eval_data = FLAGS.eval_data == 'test'
@@ -75,7 +78,7 @@ def evaluate():
         saver = tf.train.Saver(variables_to_restore)
 
         while True:
-            eval_once(saver, top_k_op)
+            eval_once(saver, top_k_op,use_vgg)
             if FLAGS.run_once:
                 break
             time.sleep(FLAGS.eval_interval_secs)

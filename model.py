@@ -3,7 +3,7 @@ import input_data
 import re
 
 FLAGS = tf.app.flags.FLAGS
-tf.app.flags.DEFINE_integer('batch_size', 128,
+tf.app.flags.DEFINE_integer('batch_size', 16,
                             """Number of images to process in a batch.""")
 tf.app.flags.DEFINE_string('data_dir',
                            'F:\\UCF-101\\data',
@@ -79,7 +79,6 @@ def distorted_inputs():
         raise ValueError('Please supply a data_dir')
     images, labels = input_data.distorted_inputs(FLAGS.data_dir, batch_size=FLAGS.batch_size)
     return images, labels
-
 
 def inference(images):
 
